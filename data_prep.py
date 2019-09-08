@@ -124,3 +124,24 @@ dense_features = features.toarray()
 
 import pickle
 pickle.dump(featurizer, open("terms_vectorizer", "wb"))
+
+
+products = {
+    'target_names': list(categories_filter),
+    'target': [],
+    'target_leaf': [],
+    'data': []
+}
+for _, product in structured_df.iterrows():
+    if depth(product['raw_labels'], default_depth) in products.get('target_names'):
+        if categories.get(depth(product['raw_labels'], default_depth)):
+            products['target'].append(
+              products.get('target_names').index(depth(product['raw_labels'], default_depth))
+            )
+            products['target_leaf'].append(
+              depth(product['raw_labels'], default_depth).split(' > ')[-1]
+            )
+            products['data'].append(u'{}.'.format(product['titles'] or ''))
+
+with open("products.json", "w") as f:
+    json.dump(products, f)
