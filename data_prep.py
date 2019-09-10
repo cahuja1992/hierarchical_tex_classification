@@ -1,15 +1,17 @@
 import pandas as pd
 import numpy as np
-data = pd.read_csv("training_data_DS_Specialist.csv")
+data = pd.read_csv("data/training_data_DS_Specialist.csv")
 data["raw_labels"] = data["labels"].apply(lambda x: x)
 data["labels"] = data["labels"].apply(lambda x: eval(x))
 
-
+cat_1 = data["labels"].apply(lambda x: x[0])
+cat_1_unique = np.unique(cat_1, return_counts=True)
+print(cat_1_unique)
 all_categories = data["labels"].apply(lambda x: '_'.join(x))
 max_heirarchy = np.max(data["labels"].apply(lambda x: len(x)).values)
 
 
-domains = [ d for d, c in unique_labels[0].items() if c >= 50]
+domains = [ v for id, v in enumerate(cat_1_unique[0]) if cat_1_unique[1][id] >= 50]
 print(domains)
 
 
@@ -31,7 +33,7 @@ def depth(field, n, sep=' > '):
 
 categories = Counter(
     depth(x, default_depth)
-    for x in structured_df.raw_labels.values.tolist()
+    for x in data.raw_labels.values.tolist()
 )
 
 
@@ -118,14 +120,15 @@ featurizer = Pipeline([
         min_df=0.00009
     ))  
 ])
-features = featurizer.fitdata['titles'])
+features = featurizer.fit_transform(data['titles'])
+print(features.shape)
 dense_features = features.toarray()
 
 
 import pickle
 pickle.dump(featurizer, open("terms_vectorizer", "wb"))
-
-
+pickle.dump(class_hierarchy, open("class_hierarchy", "wb"))
+"""
 products = {
     'target_names': list(categories_filter),
     'target': [],
@@ -145,3 +148,5 @@ for _, product in structured_df.iterrows():
 
 with open("products.json", "w") as f:
     json.dump(products, f)
+"""
+
